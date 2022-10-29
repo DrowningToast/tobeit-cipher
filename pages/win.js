@@ -73,10 +73,12 @@ const Win = () => {
   }, []);
 
   return (
-    <div className="js-container confet-container min-h-screen relative bg-black grid place-items-center text-5xl font-bold font-tech">
+    <div className="text-center js-container confet-container min-h-screen relative bg-black grid place-items-center text-5xl font-bold font-tech">
       {/* <Confetti className="absolute inset-0" /> */}
 
-      <h1 className="text-green-300">{"Congratulation. You've won."}</h1>
+      <h1 className="text-green-300">
+        {"Congratulation. You've cleansed the school!"}
+      </h1>
     </div>
   );
 };

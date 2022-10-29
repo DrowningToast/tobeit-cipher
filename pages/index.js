@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ArrowNarrowUp } from "tabler-icons-react";
 import { motion, AnimatePresence } from "framer-motion";
 import hints from "../secrets";
@@ -14,7 +14,20 @@ export default function Page() {
   const [outOfBox, setOutOfBox] = useState(false);
   const [hintImage, setHint] = useState("");
 
+  const remains = useMemo(() => {
+    if (typeof window === "undefined") return;
+    return localStorage.getItem("attemptLeft");
+  }, []);
+
   const [bulbs, setBulbs] = useState([
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
     false,
     false,
     false,
@@ -33,7 +46,7 @@ export default function Page() {
   useEffect(() => {
     const newArr = bulbs.map((value) => (value ? "1" : "0")).join("");
     if (hints[newArr]) {
-      setHint(hints[newArr]);
+      alert(hints[newArr]);
     } else {
       setHint("");
     }
@@ -57,6 +70,7 @@ export default function Page() {
         {/* Answer  */}
         {mode === "answer" && (
           <motion.div
+            suppressHydrationWarning={true}
             key="answer"
             initial={{
               opacity: 0,
@@ -68,12 +82,28 @@ export default function Page() {
               opacity: 0,
             }}
           >
-            <h1 className="font-tech text-center text-6xl text-red-400">
-              Final Answer
-            </h1>
+            {remains > 0 ? (
+              <h1
+                suppressHydrationWarning={true}
+                className="font-tech text-center text-6xl text-red-400"
+              >
+                Enter secret spell
+              </h1>
+            ) : (
+              <h1
+                suppressHydrationWarning={true}
+                className="font-tech text-center text-6xl text-red-400"
+              >
+                {"You've run out of attempts"}
+              </h1>
+            )}
 
             <div className="w-full flex mt-24 gap-x-4 items-center">
               <motion.input
+                animate={{
+                  opacity: remains > 0 ? 1 : 0.2,
+                }}
+                disabled={remains <= 0}
                 onChange={(e) => setCanSubmit(e.target.value.length > 0)}
                 layout
                 ref={answerField}
@@ -95,11 +125,22 @@ export default function Page() {
                     if (
                       confirm(
                         "Are you sure? This device will lock up if you are wrong."
-                      ) &&
-                      answerField.current.value ===
-                        process.env.NEXT_PUBLIC_SECRET
+                      )
                     ) {
-                      router.push("/win");
+                      console.log(process.env.NEXT_PUBLIC_SECRET);
+                      if (
+                        answerField.current.value
+                          .replace(" ", "")
+                          .replace(" ", "")
+                          .replace(" ", "")
+                          .replace(" ", "")
+                          .replace("'", "")
+                          .toLowerCase() === process.env.NEXT_PUBLIC_SECRET
+                      ) {
+                        router.push("/win");
+                      } else {
+                        router.push("/lock");
+                      }
                     }
                   }}
                   className="bg-green-400 rounded-full aspect-square w-12 h-12 grid place-items-center"
@@ -145,7 +186,7 @@ export default function Page() {
                 </div>
               ) : (
                 <>
-                  <div className="flex w-full justify-around px-4 gap-x-4">
+                  <div className="flex w-full justify-around px-4 gap-x-4 z-20">
                     {bulbs.map((value, index) => {
                       return (
                         <motion.div
@@ -159,7 +200,7 @@ export default function Page() {
                           animate={{
                             backgroundColor: value ? "#00ff00" : "#000000",
                           }}
-                          className={` w-16 h-16 rounded-full`}
+                          className={` w-8 h-8 rounded-full`}
                         ></motion.div>
                       );
                     })}
