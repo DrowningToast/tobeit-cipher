@@ -69,7 +69,7 @@ export default function Page() {
             }}
           >
             <h1 className="font-tech text-center text-6xl text-red-400">
-              Final Answers
+              Final Answer
             </h1>
 
             <div className="w-full flex mt-24 gap-x-4 items-center">
